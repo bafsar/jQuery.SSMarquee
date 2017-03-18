@@ -1,7 +1,7 @@
 /*
 Plugin: jQuery SSMarquee
 Version 1.0
-Author: Bil‚l AFﬁAR
+Author: Bil√¢l AF≈ûAR
 Author URL: https://www.bilalafsar.com/
 
 Plugin URL : https://github.com/bafsar/jQuery.SSMarquee
