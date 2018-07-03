@@ -1,4 +1,4 @@
-/*
+/*!
 Plugin: jQuery SSMarquee
 Version 1.0
 Author: Bilâl AFŞAR
