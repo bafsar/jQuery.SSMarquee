@@ -13,151 +13,151 @@ Licence: MIT Licence
     "use strict";
 
     $.fn.SSMarquee = function(settings) {
-        // ds means Default Speed
-        const dS = 45;
-        // dBs means Default Buffer Size
-        const dBs = 10;
-        // dSa means Default Scroll Amount
-        const dSa = 1;
+
+        const defaultSpeed = 45;
+        const defaultbufferSize = 10;
+        const defaultScrollAmount = 1;
+
         settings = $.extend({
                 direction: "top",
-                speed: dS,
-                scrollAmount: dSa,
+                speed: defaultSpeed,
+                scrollAmount: defaultScrollAmount,
                 pauseOnHover: true,
-                bufferSize: dBs
+                bufferSize: defaultbufferSize
             },
             settings);
 
         /*  maxSpeed : 10, minSpeed: 70 */
-        const minS = 10;
-        const maxS = 70;
-        const ts = parseInt(settings.speed);
-        settings.speed = isNaN(ts) ? dS : (ts < minS ? minS : (ts > maxS ? maxS : ts));
+        const minSpeed = 10;
+        const maxSpeed = 70;
+        const givenSpeed = parseInt(settings.speed);
+        settings.speed = isNaN(givenSpeed)
+            ? defaultSpeed
+            : (givenSpeed < minSpeed ? minSpeed : (givenSpeed > maxSpeed ? maxSpeed : givenSpeed));
 
-        const minSa = 0;
-        const tsa = parseFloat(settings.scrollAmount.toString().replace(",", "."));
-        settings.scrollAmount = isNaN(tsa) ? dSa : (tsa <= minSa ? dSa : tsa);
+        const minScrollAmount = 0;
+        const givenScrollAmount = parseFloat(settings.scrollAmount.toString().replace(",", "."));
+        settings.scrollAmount = isNaN(givenScrollAmount)
+            ? defaultScrollAmount
+            : (givenScrollAmount <= minScrollAmount ? defaultScrollAmount : givenScrollAmount);
 
-        const minBs = 0;
+        const minBufferSize = 0;
         const tbs = parseInt(settings.bufferSize);
-        settings.bufferSize = isNaN(tbs) ? dBs : (tbs < minBs ? minBs : tbs);
+        settings.bufferSize = isNaN(tbs) ? defaultbufferSize : (tbs < minBufferSize ? minBufferSize : tbs);
 
-        // w means wrapper
-        var w = $(this);
-        w.css("overflow", "hidden");
+        var wrapper = $(this);
+        wrapper.css("overflow", "hidden");
 
-        var backupContent = w.find(":first");
+        var backupContent = wrapper.find(":first");
 
         var setMarquee = function() {
 
-            const marqueeFunction = function() {
-                // c means content (first and only item of wrapper)
-                var c = w.find(":first");
+            wrapper.html(backupContent.clone());
 
-                // i means interval (it sets inside of start function)
-                var i = 0;
-                // bs means Buffer Size (as px)
-                var bs = settings.bufferSize;
+            // content (first and only item of wrapper)
+            var content = wrapper.find(":first");
 
-                var ch = c.height();
-                var cw = c.width();
-                var wh = w.height();
-                var ww = w.width();
+            // interval (it sets inside of start function)
+            var interval = 0;
+            // Buffer Size (as px)
+            var bufferSize = settings.bufferSize;
 
-                // l0P => leftZeroPosition, t0P => topZeroPosition, b0P => bottomZeroPosition, r0P => rightZeroPosition 
-                var l0P = c.offset().left;
-                var t0P = c.offset().top;
-                var b0P = c.offset().top + w.height();
-                var r0P = c.offset().left + w.width();
+            var contentHeight = content.height();
+            var contentWidth = content.width();
+            var wrapperHeight = wrapper.height();
+            var wrapperWidth = wrapper.width();
 
-                var rtlSp = r0P + bs;
-                var ltrSp = t0P + wh;
-                var bttSp = t0P + wh + bs;
-                var ttbSp = t0P - (ch + bs);
+            var leftZeroPosition = content.offset().left;
+            var topZeroPosition = content.offset().top;
+            var bottomZeroPosition = content.offset().top + wrapper.height();
+            var rightZeroPosition = content.offset().left + wrapper.width();
 
-                var moveToRight = function(o, offset, amount) {
-                    o.offset({ left: offset.left + amount });
-                    if (o.offset().left >= (r0P + bs)) {
-                        o.offset({ left: (l0P - (cw + bs)) });
-                    }
-                };
-                var moveToLeft = function(o, offset, amount) {
-                    o.offset({ left: offset.left - amount });
-                    if (o.offset().left <= (l0P - (cw + bs))) {
-                        o.offset({ left: l0P + ww + bs });
-                    }
-                };
-                var moveToTop = function(o, offset, amount) {
-                    o.offset({ top: offset.top - amount });
-                    if (o.offset().top <= (t0P - (ch + bs))) {
-                        o.offset({ top: t0P + wh + bs });
-                    }
-                };
-                var moveToBottom = function(o, offset, amount) {
-                    o.offset({ top: offset.top + amount });
-                    if (o.offset().top >= (b0P + bs)) {
-                        o.offset({ top: (t0P - (ch + bs)) });
-                    }
-                };
+            var rightToLeftStartPosition = rightZeroPosition + bufferSize;
+            var leftToRightStartPosition = topZeroPosition + wrapperHeight;
+            var bottomToTopStartPosition = topZeroPosition + wrapperHeight + bufferSize;
+            var topToBottomStartPosition = topZeroPosition - (contentHeight + bufferSize);
 
-                const setStartPosition = function() {
-                    switch (settings.direction) {
-                    case "right":
-                        c.offset({ left: ltrSp });
-                        break;
-                    case "left":
-                        c.offset({ left: rtlSp });
-                        break;
-                    case "bottom":
-                        c.offset({ top: ttbSp });
-                        break;
-                    default:
-                        c.offset({ top: bttSp });
-                        break;
-                    };
-                };
-
-                var start = function() {
-                    var sa = settings.scrollAmount;
-                    i = setInterval(function() {
-                            const ofs = c.offset();
-                            switch (settings.direction) {
-                            case "right":
-                                moveToRight(c, ofs, sa);
-                                break;
-                            case "left":
-                                moveToLeft(c, ofs, sa);
-                                break;
-                            case "bottom":
-                                moveToBottom(c, ofs, sa);
-                                break;
-                            default:
-                                moveToTop(c, ofs, sa);
-                                break;
-                            };
-                        },
-                        settings.speed);
-                };
-
-                if (settings.pauseOnHover) {
-                    $(w)
-                        .hover(function() {
-                                clearInterval(i);
-                            },
-                            function() {
-                                start();
-                            });
-                };
-
-                setStartPosition();
-                start();
+            var moveToRight = function(object, offset, amount) {
+                object.offset({ left: offset.left + amount });
+                if (object.offset().left >= (rightZeroPosition + bufferSize)) {
+                    object.offset({ left: (leftZeroPosition - (contentWidth + bufferSize)) });
+                }
             };
-            marqueeFunction();
+            var moveToLeft = function(object, offset, amount) {
+                object.offset({ left: offset.left - amount });
+                if (object.offset().left <= (leftZeroPosition - (contentWidth + bufferSize))) {
+                    object.offset({ left: leftZeroPosition + wrapperWidth + bufferSize });
+                }
+            };
+            var moveToTop = function(object, offset, amount) {
+                object.offset({ top: offset.top - amount });
+                if (object.offset().top <= (topZeroPosition - (contentHeight + bufferSize))) {
+                    object.offset({ top: topZeroPosition + wrapperHeight + bufferSize });
+                }
+            };
+            var moveToBottom = function(object, offset, amount) {
+                object.offset({ top: offset.top + amount });
+                if (object.offset().top >= (bottomZeroPosition + bufferSize)) {
+                    object.offset({ top: (topZeroPosition - (contentHeight + bufferSize)) });
+                }
+            };
+
+            const setStartPosition = function() {
+                switch (settings.direction) {
+                case "right":
+                    content.offset({ left: leftToRightStartPosition });
+                    break;
+                case "left":
+                    content.offset({ left: rightToLeftStartPosition });
+                    break;
+                case "bottom":
+                    content.offset({ top: topToBottomStartPosition });
+                    break;
+                default:
+                    content.offset({ top: bottomToTopStartPosition });
+                    break;
+                };
+            };
+
+            var start = function() {
+                var scrollAmount = settings.scrollAmount;
+                interval = setInterval(function() {
+                        const offset = content.offset();
+                        switch (settings.direction) {
+                        case "right":
+                            moveToRight(content, offset, scrollAmount);
+                            break;
+                        case "left":
+                            moveToLeft(content, offset, scrollAmount);
+                            break;
+                        case "bottom":
+                            moveToBottom(content, offset, scrollAmount);
+                            break;
+                        default:
+                            moveToTop(content, offset, scrollAmount);
+                            break;
+                        };
+                    },
+                    settings.speed);
+            };
+
+            if (settings.pauseOnHover) {
+                $(wrapper)
+                    .hover(function() {
+                            clearInterval(interval);
+                        },
+                        function() {
+                            start();
+                        });
+            };
+
+            setStartPosition();
+            start();
         };
+        setMarquee();
 
         $(window)
             .resize(function() {
-                w.html(backupContent.clone());
                 setMarquee();
             })
             .resize();
