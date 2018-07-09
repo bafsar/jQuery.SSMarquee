@@ -1,6 +1,6 @@
 /*!
 Plugin: jQuery SSMarquee
-Version 1.0
+Version 1.1
 Author: Bilâl AFŞAR
 Author URL: https://www.bilalafsar.com/
 
@@ -42,11 +42,15 @@ Licence: MIT Licence
             : (givenScrollAmount <= minScrollAmount ? defaultScrollAmount : givenScrollAmount);
 
         const minBufferSize = 0;
-        const tbs = parseInt(settings.bufferSize);
-        settings.bufferSize = isNaN(tbs) ? defaultbufferSize : (tbs < minBufferSize ? minBufferSize : tbs);
+        const givenBufferSize = parseInt(settings.bufferSize);
+        settings.bufferSize = isNaN(givenBufferSize)
+            ? defaultbufferSize
+            : (givenBufferSize < minBufferSize ? minBufferSize : givenBufferSize);
 
         var wrapper = $(this);
         wrapper.css("overflow", "hidden");
+        // Added version: 1.1
+        wrapper.find(":first").css("display", "none");
 
         var backupContent = wrapper.find(":first");
 
@@ -56,6 +60,9 @@ Licence: MIT Licence
 
             // content (first and only item of wrapper)
             var content = wrapper.find(":first");
+
+            // Added version: 1.1
+            content.css("display", "");
 
             // interval (it sets inside of start function)
             var interval = 0;
@@ -154,12 +161,14 @@ Licence: MIT Licence
             setStartPosition();
             start();
         };
-        setMarquee();
 
+        // Changed version: 1.1
+        setTimeout(function() { setMarquee(); }, 1000);
+
+        // Changed version: 1.1
         $(window)
             .resize(function() {
                 setMarquee();
-            })
-            .resize();
+            });
     };
 })(jQuery);
