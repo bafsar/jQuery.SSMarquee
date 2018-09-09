@@ -51,20 +51,24 @@ Licence: MIT Licence
         if ($(this).length > 1) {
             $(this).each(function(index, value) {
                 const obj = $(this);
-                const marqueeSet = obj.attr("data-ssmarquee");
-                if (marqueeSet !== "ok") {
-                    obj.attr("data-ssmarquee", "ok");
-                    let id = obj.attr("id");
-                    if (id === undefined || id === "") {
 
-                        if (isNaN(window.SSMarqueeCounter))
-                            window.SSMarqueeCounter = 0;
-
-                        id = `ssmarquee-${window.SSMarqueeCounter++}`;
-                        obj.attr("id", id);
-                    }
-                    $(`#${id}`).SSMarquee(settings);
+                let id = obj.attr("id");
+                if (id === undefined || id === "") {
+                    id = `ssmarquee-${index}`;
+                    obj.attr("id", id);
                 }
+
+                const sameIdentifiedElements = $(`[id=${id}]`);
+                if (sameIdentifiedElements.length > 1) {
+                    sameIdentifiedElements.each(function(i, v) {
+                        if (i > 0) {
+                            const newId = $(this).attr("id") + "-" + i;
+                            $(this).attr("id", newId);
+                        }
+                    });
+                }
+
+                $(`#${id}`).SSMarquee(settings);
             });
             return false;
         }
