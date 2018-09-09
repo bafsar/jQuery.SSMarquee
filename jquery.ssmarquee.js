@@ -1,6 +1,6 @@
 /*!
 Plugin: jQuery SSMarquee
-Version 1.1
+Version 1.2
 Author: Bilâl AFŞAR
 Author URL: https://www.bilalafsar.com/
 
@@ -11,6 +11,9 @@ Licence: MIT Licence
 (function($) {
 
     "use strict";
+
+    // Added version: 1.2
+    window.SSMarqueeCounter = 0;
 
     $.fn.SSMarquee = function(settings) {
 
@@ -46,6 +49,24 @@ Licence: MIT Licence
         settings.bufferSize = isNaN(givenBufferSize)
             ? defaultbufferSize
             : (givenBufferSize < minBufferSize ? minBufferSize : givenBufferSize);
+
+        // Added version: 1.2
+        if ($(this).length > 1) {
+            $(this).each(function(index, value) {
+                const obj = $(this);
+                const marqueeSet = obj.attr("data-ssmarquee");
+                if (marqueeSet !== "ok") {
+                    obj.attr("data-ssmarquee", "ok");
+                    let id = obj.attr("id");
+                    if (id === undefined || id === "") {
+                        id = `ssmarquee-${window.SSMarqueeCounter++}`;
+                        obj.attr("id", id);
+                    }
+                    $(`#${id}`).SSMarquee(settings);
+                }
+            });
+            return false;
+        }
 
         var wrapper = $(this);
         wrapper.css("overflow", "hidden");
