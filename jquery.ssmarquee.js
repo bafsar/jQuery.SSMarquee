@@ -12,9 +12,6 @@ Licence: MIT Licence
 
     "use strict";
 
-    // Added version: 1.2
-    window.SSMarqueeCounter = 0;
-
     $.fn.SSMarquee = function(settings) {
 
         const defaultSpeed = 45;
@@ -59,6 +56,10 @@ Licence: MIT Licence
                     obj.attr("data-ssmarquee", "ok");
                     let id = obj.attr("id");
                     if (id === undefined || id === "") {
+
+                        if (isNaN(window.SSMarqueeCounter))
+                            window.SSMarqueeCounter = 0;
+
                         id = `ssmarquee-${window.SSMarqueeCounter++}`;
                         obj.attr("id", id);
                     }
